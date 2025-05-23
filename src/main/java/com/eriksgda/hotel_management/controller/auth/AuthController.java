@@ -1,6 +1,6 @@
 package com.eriksgda.hotel_management.controller.auth;
 
-import com.eriksgda.hotel_management.model.ResponseUserDTO;
+import com.eriksgda.hotel_management.model.SignupResponseDTO;
 import com.eriksgda.hotel_management.model.SignupRequestDTO;
 import com.eriksgda.hotel_management.service.auth.AuthService;
 import com.eriksgda.hotel_management.service.auth.AuthServiceImpl;
@@ -27,7 +27,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signupUser(@RequestBody SignupRequestDTO data) {
         try {
-            ResponseUserDTO response = this.authService.createUser(data);
+            SignupResponseDTO response = this.authService.createUser(data);
 
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (EntityExistsException exception) {

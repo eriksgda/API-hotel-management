@@ -2,7 +2,7 @@ package com.eriksgda.hotel_management.service.auth;
 
 import com.eriksgda.hotel_management.entity.User;
 import com.eriksgda.hotel_management.enums.UserRole;
-import com.eriksgda.hotel_management.model.ResponseUserDTO;
+import com.eriksgda.hotel_management.model.SignupResponseDTO;
 import com.eriksgda.hotel_management.model.SignupRequestDTO;
 import com.eriksgda.hotel_management.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public ResponseUserDTO createUser(SignupRequestDTO dto) {
+    public SignupResponseDTO createUser(SignupRequestDTO dto) {
         if (this.userRepository.findFirstByEmail(dto.email()).isPresent()) {
             throw new EntityExistsException("User already exits with this email: " + dto.email());
         }
@@ -61,6 +61,6 @@ public class AuthServiceImpl implements AuthService{
 
         this.userRepository.save(newUser);
 
-        return ResponseUserDTO.fromEntity(newUser);
+        return SignupResponseDTO.fromEntity(newUser);
     }
 }
