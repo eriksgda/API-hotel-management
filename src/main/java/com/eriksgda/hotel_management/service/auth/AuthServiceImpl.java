@@ -2,12 +2,20 @@ package com.eriksgda.hotel_management.service.auth;
 
 import com.eriksgda.hotel_management.entity.User;
 import com.eriksgda.hotel_management.enums.UserRole;
+import com.eriksgda.hotel_management.model.AuthRequestDTO;
+import com.eriksgda.hotel_management.model.AuthResponseDTO;
 import com.eriksgda.hotel_management.model.SignupResponseDTO;
 import com.eriksgda.hotel_management.model.SignupRequestDTO;
 import com.eriksgda.hotel_management.repository.UserRepository;
+import com.eriksgda.hotel_management.service.UserService;
+import com.eriksgda.hotel_management.util.JWTUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +25,23 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTUtil jwtUtil;
+    private final UserService userService;
 
     @Autowired
-    public AuthServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(
+            UserRepository repository,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            JWTUtil jwtUtil,
+            UserService userService) {
         this.userRepository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.userService = userService;
     }
 
     @PostConstruct
@@ -62,5 +80,22 @@ public class AuthServiceImpl implements AuthService{
         this.userRepository.save(newUser);
 
         return SignupResponseDTO.fromEntity(newUser);
+    }
+
+    @Override
+    public AuthResponseDTO createAuthToken(AuthRequestDTO dto) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.email(), dto.password()));
+        } catch (BadCredentialsException exception) {
+            throw new BadCredentialsException("Incorrect email or password.");
+        }
+        final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(dto.email());
+
+        User user = userRepository.findFirstByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalStateException("User authenticated but not found."));
+
+        final String token = jwtUtil.generateToken(userDetails);
+
+        return new AuthResponseDTO(token, user.getId(), user.getUserRole());
     }
 }
