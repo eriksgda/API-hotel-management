@@ -71,13 +71,13 @@ public class AuthServiceImpl implements AuthService{
         if (this.userRepository.findFirstByEmail(dto.email()).isPresent()) {
             throw new EntityExistsException("User already exits with this email: " + dto.email());
         }
-        User newUser = User.builder()
+        User user = User.builder()
                 .email(dto.email())
                 .password(passwordEncoder.encode(dto.password()))
                 .name(dto.name())
                 .userRole(UserRole.CUSTOMER).build();
 
-        this.userRepository.save(newUser);
+        User newUser = this.userRepository.save(user);
 
         return SignupResponseDTO.fromEntity(newUser);
     }
