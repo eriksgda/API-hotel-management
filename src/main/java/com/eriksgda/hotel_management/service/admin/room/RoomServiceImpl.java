@@ -1,10 +1,7 @@
 package com.eriksgda.hotel_management.service.admin.room;
 
 import com.eriksgda.hotel_management.entity.Room;
-import com.eriksgda.hotel_management.model.CreateRoomRequestDTO;
-import com.eriksgda.hotel_management.model.CreateRoomResponseDTO;
-import com.eriksgda.hotel_management.model.RoomResponseDTO;
-import com.eriksgda.hotel_management.model.RoomsResponseDTO;
+import com.eriksgda.hotel_management.model.*;
 import com.eriksgda.hotel_management.repository.RoomRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,5 +71,18 @@ public class RoomServiceImpl implements RoomService{
         }
 
         return RoomResponseDTO.fromEntity(optionalRoom.get());
+    }
+
+    @Override
+    public RoomResponseDTO updateRoom(UUID id, UpdateRequestDTO dto) {
+        Room room = this.roomRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Room doesn't exist.")
+        );
+
+        room.setName(dto.name());
+        room.setType(dto.type());
+        room.setPrice(dto.price());
+
+        return RoomResponseDTO.fromEntity(this.roomRepository.save(room));
     }
 }
