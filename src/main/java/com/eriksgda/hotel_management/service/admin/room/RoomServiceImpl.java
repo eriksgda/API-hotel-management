@@ -3,16 +3,19 @@ package com.eriksgda.hotel_management.service.admin.room;
 import com.eriksgda.hotel_management.entity.Room;
 import com.eriksgda.hotel_management.model.CreateRoomRequestDTO;
 import com.eriksgda.hotel_management.model.CreateRoomResponseDTO;
+import com.eriksgda.hotel_management.model.RoomResponseDTO;
 import com.eriksgda.hotel_management.model.RoomsResponseDTO;
 import com.eriksgda.hotel_management.repository.RoomRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collector;
+
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,8 +60,19 @@ public class RoomServiceImpl implements RoomService{
         Page<Room> rooms = this.roomRepository.findAll(pageable);
 
         return new RoomsResponseDTO(
-                rooms.stream().map(CreateRoomResponseDTO::fromEntity).collect(Collectors.toList()),
+                rooms.stream().map(RoomResponseDTO::fromEntity).collect(Collectors.toList()),
                 rooms.getTotalPages(),
                 rooms.getPageable().getPageNumber());
+    }
+
+    @Override
+    public RoomResponseDTO getRoomById(UUID id) {
+        Optional<Room> optionalRoom = this.roomRepository.findById(id);
+
+        if (optionalRoom.isEmpty()) {
+            throw new EntityNotFoundException("Room doesn't exist.");
+        }
+
+        return RoomResponseDTO.fromEntity(optionalRoom.get());
     }
 }
