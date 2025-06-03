@@ -1,9 +1,6 @@
 package com.eriksgda.hotel_management.controller.admin;
 
-import com.eriksgda.hotel_management.model.CreateRoomRequestDTO;
-import com.eriksgda.hotel_management.model.CreateRoomResponseDTO;
-import com.eriksgda.hotel_management.model.RoomResponseDTO;
-import com.eriksgda.hotel_management.model.RoomsResponseDTO;
+import com.eriksgda.hotel_management.model.*;
 import com.eriksgda.hotel_management.service.admin.room.RoomService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +48,18 @@ public class RoomController {
     public ResponseEntity<?> getRoomById(@PathVariable UUID id) {
         try {
             RoomResponseDTO response = this.roomService.getRoomById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+        }
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateRoomById(@PathVariable UUID id, @RequestBody UpdateRequestDTO request) {
+        try {
+            RoomResponseDTO response = this.roomService.updateRoom(id, request);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (EntityNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
