@@ -85,4 +85,13 @@ public class RoomServiceImpl implements RoomService{
 
         return RoomResponseDTO.fromEntity(this.roomRepository.save(room));
     }
+
+    @Override
+    public void deleteRoom(UUID id) {
+        Room room = this.roomRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Room doesn't exist.")
+        );
+
+        this.roomRepository.delete(room);
+    }
 }

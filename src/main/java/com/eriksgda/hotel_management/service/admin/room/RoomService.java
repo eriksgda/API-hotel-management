@@ -9,4 +9,5 @@ public interface RoomService {
     RoomsResponseDTO getAllRooms(Integer pageNumber);
     RoomResponseDTO getRoomById(UUID id);
     RoomResponseDTO updateRoom(UUID id, UpdateRequestDTO updateRequestDTO);
+    void deleteRoom(UUID id);
 }
