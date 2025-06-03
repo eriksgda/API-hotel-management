@@ -2,12 +2,16 @@ package com.eriksgda.hotel_management.controller.admin;
 
 import com.eriksgda.hotel_management.model.CreateRoomRequestDTO;
 import com.eriksgda.hotel_management.model.CreateRoomResponseDTO;
+import com.eriksgda.hotel_management.model.RoomResponseDTO;
 import com.eriksgda.hotel_management.model.RoomsResponseDTO;
 import com.eriksgda.hotel_management.service.admin.room.RoomService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/admin/rooms/")
@@ -38,6 +42,18 @@ public class RoomController {
         try {
             RoomsResponseDTO response = this.roomService.getAllRooms(pageNumber);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getRoomById(@PathVariable UUID id) {
+        try {
+            RoomResponseDTO response = this.roomService.getRoomById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (EntityNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
         }
