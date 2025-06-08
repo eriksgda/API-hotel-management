@@ -20,18 +20,18 @@ public record ReservationResponseDTO(
         UUID userId,
         String username
 ) {
-    public static ReservationResponseDTO fromEntities(Reservation reservation, Room room, User user) {
+    public static ReservationResponseDTO fromEntity(Reservation reservation) {
         return new ReservationResponseDTO(
                 reservation.getId(),
                 reservation.getCheckInDate(),
                 reservation.getCheckOutDate(),
                 reservation.getPrice(),
                 reservation.getReservationStatus(),
-                room.getId(),
-                room.getType(),
-                room.getName(),
-                user.getId(),
-                user.getName()
+                reservation.getRoom().getId(),
+                reservation.getRoom().getType(),
+                reservation.getRoom().getName(),
+                reservation.getUser().getId(),
+                reservation.getUser().getName()
         );
     }
 }

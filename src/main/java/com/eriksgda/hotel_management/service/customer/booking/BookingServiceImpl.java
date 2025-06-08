@@ -53,7 +53,7 @@ public class BookingServiceImpl implements BookingService{
 
             Reservation res = this.reservationRepository.save(reservation);
 
-            return ReservationResponseDTO.fromEntities(res, optionalRoom.get(), optionalUser.get());
+            return ReservationResponseDTO.fromEntity(res);
         }
 
         throw new IllegalArgumentException("error");
